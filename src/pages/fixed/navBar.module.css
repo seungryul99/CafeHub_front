@@ -1,0 +1,42 @@
+.wrapper {
+    display: flex;
+    width: 100%;
+    height: 60px;
+    justify-content: space-around;
+    align-items: flex-start;
+    border: 1px solid #D5D5D7;
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.13);
+    background-color: white;
+    position: fixed;
+    bottom: 0;
+    z-index: 3;
+
+
+}
+.img {
+    width: 24px;
+    height: 24px;
+}
+.text {
+    text-align: center;
+    font-family: "Noto Sans KR";
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 350;
+    line-height: 12px; /* 120% */
+    letter-spacing: -0.6px;
+    white-space: nowrap;
+    margin-top: 2px;
+}
+
+.navA {
+    cursor: pointer;
+    display: flex;
+    padding: 11.5px 0px 11.5px 0px;
+    flex-direction: column;
+    width: 20%;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+

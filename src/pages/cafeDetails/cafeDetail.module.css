@@ -1,0 +1,270 @@
+.cafeInfo{
+    position: relative;
+    width: 100%;
+    height: 450px;
+}
+.cafeInfoBg{
+    -webkit-user-drag: none;
+    width: 100%;
+    height: 200px;
+}
+.cafeInfoTitleContainer{
+    position: absolute;
+    top: 135px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    width: 325px;
+    height: auto;
+    border-radius: 10px;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    
+}
+.cafeInfoTitleLike{
+    display: flex;
+    width: 325px;
+    height: auto;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+}
+.cafeInfoTitle{
+    color: #000;
+    display: flex;
+    font-family: NanumSquareOTF;
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: -0.6px;
+    width: 320px;
+    justify-content: center;
+    height: auto;
+    margin-top: 10px;
+}
+.likeContainer{
+    cursor: pointer;
+    margin-top: 10px;
+    margin-right: 10px;
+    display: flex;
+    justify-content: right;
+}
+.like{
+    width: 20px;
+    height: 18px;
+}
+
+.cafeInfoPlus{
+    display: flex;
+    width: 100%;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    margin-top: 10px;
+
+    font-family: NanumSquareOTF;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 12px;
+    letter-spacing: -0.6px;
+}
+
+.reviewStar{
+    width: 20px;
+    height: 20px;
+    margin-left: 15px;
+    -webkit-user-drag: none;
+}
+.cafeInfoDetailContainer{
+    background-color: #FFF;
+    width: 100%;
+    height: 230px;
+    display: flex;
+}
+.cafeInfoDetailWrapper{
+    margin-top: 90px;
+    margin-left: 45px;
+} 
+.detailInfo{
+    font-family: NanumSquareOTF;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: -0.6px;
+}
+.iconTextContainer{
+    margin-top: 20px;
+}
+.iconTextWrapper{
+    margin-top: 15px;
+}
+.detailText{
+    color: #000;
+    font-family: NanumSquareOTF;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 12px; /* 100% */
+    letter-spacing: -0.6px;
+    margin-left: 8px;
+}
+
+.cafeMenuContainer{
+    background-color: white;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.cafeMenuTextMenu{
+    color: #000;
+    font-family: NanumSquareOTF;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: -0.6px;
+    height: 15px;
+
+    margin-top: 40px;
+    margin-left: 45px;
+}
+.bestMenuList{
+    margin-top: 5px;
+    width: 100%;
+}
+
+.flexLineWrapper{
+    margin-left: 45px;
+    width: 340px;
+    height: auto;
+}
+.flexLine{
+    display: flex;
+    width: 250px;
+    justify-content: space-between;
+    margin-top: 15px;
+    font-family: NanumSquareOTF;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 12px;
+    letter-spacing: -0.6px;
+    margin-left: 38px;
+}
+hr{
+    background:#E2E1E5;
+    height:1px;
+    border:0;
+}
+.reviewHRContainer {
+    margin-top: 11px;
+    margin-bottom: 13px;
+    justify-content: center;
+    
+}
+.reviewHR{
+    width: 350px;
+}
+.menuPlus{
+    cursor: pointer;
+    display: flex;
+    margin-top: 20px;
+    margin-left: 335px;
+    margin-bottom: 20px;
+
+    color: rgb(0, 0, 0);
+
+    text-align: right;
+    font-family: NanumSquareOTF;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 300;
+    letter-spacing: -0.6px;
+}
+
+.cafeBestReviewContainer{
+    margin-top: 10px;
+    background-color: white;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.cafeBestReviewReviewCnt{
+    font-family: NanumSquareOTF;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: -0.6px;
+    margin-top: 20px;
+    margin-left: 45px;
+    
+}
+
+.cafeBestReviewRatingContainer{
+    display: flex;
+    margin-left: 45px;
+    margin-top: 20px;
+    width: 350px;
+    align-items: center;
+    justify-content: space-between;
+
+
+}
+.ratingWrapper{
+    display: flex;
+}
+.cafeRatingFontSize{
+    font-family: NanumSquareOTF;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: -0.6px;
+    line-height: 32px;
+
+}
+
+
+.writeReview{
+    cursor: pointer;
+    width: 68px;
+    height: 22.867px;
+    border-radius: 10px;
+    border: 1px solid #ACABB0;
+
+    background: #FFF;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+}
+.reviewWriteBtn{
+    width:'10px';
+    height:'10px';
+    -webkit-user-drag: none;
+}
+
+
+  .reviewPlus{
+    cursor: pointer;
+    display: flex;
+    margin-left: 335px;
+    margin-bottom: 20px;
+
+    color: rgb(0, 0, 0);
+
+    text-align: right;
+    font-family: NanumSquareOTF;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 300;
+    letter-spacing: -0.6px;
+  }
+  

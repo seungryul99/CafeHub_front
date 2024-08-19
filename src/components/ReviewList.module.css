@@ -1,0 +1,232 @@
+.ReviewFlexLineWrapper{
+    width: 340px;
+    height: auto;
+    margin-left: 45px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+.authorNameDate{
+    width: auto;
+    height: 12px;
+    display: flex;
+    margin-bottom: 2px;
+    justify-content: space-between;
+}
+.bestReviewflexLine{
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+
+}
+.authorNameDateWrapper{
+  width: auto;
+  height: auto;
+}
+.authorName{
+    font-family: NanumSquareOTF;
+    width: auto;
+
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.6px;
+}
+.authorDate{
+    color: #828282;
+    font-family: NanumSquareOTF;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: -0.6px;
+    margin-left: 8px;
+}
+
+.settingIconWrapper{
+  display: flex;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.reviewContentContainer{
+    width: 320px;
+    height: auto;
+    margin-top: 7px;
+}
+
+  .reviewContent{
+    font-family: NanumSquareOTF;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: -0.6px;
+    line-height: 20px;
+
+
+  }
+ 
+  .viewMore{
+    cursor: pointer;
+
+    color: #828282;
+    font-family: NanumSquareOTF;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: -0.6px;
+  }
+
+  .reviewCommentLikeContainer{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    align-items: center;
+
+    font-family: NanumSquareOTF;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: -0.6px;
+  }
+  .checkReviewLikeWrapper{
+    display: flex;
+    margin-left: auto;
+  }
+
+  .comment{
+    
+    margin-left: 5px;
+  }
+
+hr{
+    background:#E2E1E5;
+    height:1px;
+    border:0;
+}
+.reviewHRContainer {
+    margin-top: 11px;
+    margin-bottom: 13px;
+    justify-content: center;
+    
+}
+.reviewHR{
+    width: 350px;
+}
+
+
+
+
+.dropMenuContainer{
+  position: absolute;
+  top: 18px;
+  right: 5px;
+
+}
+
+.dropMenuWrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 20px;
+  border: 1px solid black;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  font-family: NanumSquareOTF;
+}
+.dropMenuWrapper:hover{
+  color: #FFF;
+  background: #FF4F4F;
+}
+
+.photoContainer{
+  width: 320px;
+  height: 100px;
+  margin-top: 15px;
+  margin-bottom: 7px;
+  display: flex;
+
+}
+.reviewPhoto{
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 3px;
+  cursor: pointer;
+  -webkit-user-drag: none;
+
+}
+
+.morePhotosContainer{
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  position: relative;
+  cursor: pointer;
+
+}
+.morePhotosOverlay{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 300px;
+  height: 300px;
+
+}
+.modalOverlay{
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.7); /* 오버레이의 배경색과 투명도를 설정합니다 */
+  z-index: 5
+}
+
+.custom-arrow {
+  width: 30px; /* 원하는 크기로 변경 */
+  height: 30px; /* 원하는 크기로 변경 */
+  background-color: rgba(0, 0, 0, 0.5); /* 배경 색상 변경 가능 */
+  border-radius: 50%; /* 원형 버튼으로 만들기 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-arrow::before {
+  font-size: 20px; /* 아이콘 크기 조정 */
+  color: white; /* 아이콘 색상 */
+}
+
+.modalExit{
+  position: absolute;
+  font-size: 20px;
+  color: rgb(175, 175, 175);
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.like{
+  width: 14px;
+  height: 12px;
+  margin-right: 5px;
+  cursor: pointer;
+
+}
+

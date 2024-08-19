@@ -1,0 +1,106 @@
+.containerWrapper {
+    display:flex;
+    position: relative;
+    width: 100%;
+    justify-content: center;
+    height: 91px;
+    align-items: center;
+}
+.textContainer {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    margin-left: 28px;
+    z-index: 1;
+}
+.icon{
+    width: 20px;
+    height: 23px;
+    flex-shrink: 0;
+}
+.textOnBg{
+    color: #FFF;
+    font-family: NanumSquare;
+    font-size: 25px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 12px; /* 48% */
+    letter-spacing: -0.6px;
+    margin-left: 7px;
+}
+.imgBg{
+    display: flex;
+    position:absolute;
+    width: 100%;
+    -webkit-user-drag: none;
+
+    height: 91px;
+}
+.flexLine {
+    display: flex;
+    width: 430px;
+    height: 105px;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    align-items: center;
+    margin-top: 4px;
+
+}
+
+.cafeImg{
+    -webkit-user-drag: none;
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    margin-left: 35px;
+}
+
+.CafeTextContainer{
+    display: flex;
+    align-items: center;
+    margin-left: 25px;
+    height: 105px;
+    width: 260px;
+
+    justify-content: space-between;
+
+}
+.cafeTitle {
+    color: #000;
+    font-family: NanumSquareOTF;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: -0.6px;
+    width: 250px;
+    display: block;
+    height: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow :ellipsis;
+}
+.cafeTheme {
+    color: #858585;
+    font-family: NanumSquareOTF;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 12px; /* 100% */
+    letter-spacing: -0.6px;
+    display: block;
+    margin-top: 4px;
+}
+
+.starRatingReview{
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    margin-left: -2px;
+}
+.img_star{
+    -webkit-user-drag: none;
+    width: 17px;
+    height: 17px;
+}
+

@@ -1,0 +1,13 @@
+.starContainer{
+    margin-top: 4px;
+}
+
+.starSize{
+    width: 30px;
+    height: 30px;
+    -webkit-user-drag: none;
+}
+
+.grayStar{
+    filter: grayscale(100%);
+}
