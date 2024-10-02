@@ -30,6 +30,7 @@ function CafeList() {
     
 
 
+
     const pageLoad = (currentPage) => {
         axios.get(`${process.env.REACT_APP_APIURL}/api/cafeList/${type}/${sortedType}/${currentPage}`)
         .then(response => {
