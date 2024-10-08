@@ -1,50 +1,35 @@
 import React, { useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../../components/loading';
-import { Cookies, useCookies } from 'react-cookie';
 
 const OAuthCallback = ({ setIsLogin }) => {
-    const code = new URL(window.location.href).searchParams.get('code');
     const navigate = useNavigate();
 
     useEffect(() => {
-        const getToken = async () => {
-            try {
-                const response = await axios
-                    .get(
-                        `${process.env.REACT_APP_APIURL}/api/member/login/kakao?code=${code}`,
-                    )
-                    .then(res => {
-
-                        console.log("해치웠나?");
-
-                        const authorizationToken = res.headers.get("Authorization");
-                        console.log(authorizationToken)
-
-
-                        if (authorizationToken) {
-                            // JWT 토큰을 세션 스토리지에 저장
-                            sessionStorage.setItem('accessToken', authorizationToken);
-                            setIsLogin(sessionStorage.getItem('accessToken'))
-
-                            navigate('/');
-                        } else {
-                            console.error('토큰이 응답 헤더에 포함되지 않았습니다.');
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('로그인 실패:', error);
-                    });
-            } catch (e) {
-                console.error(e);
-            }
-
+        // 쿠키에서 jwtAccessToken을 가져옵니다.
+        const getAccessTokenFromCookie = () => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; JwtAccessToken=`); // 'JwtAccessToken'으로 분리
+            if (parts.length === 2) return parts.pop().split(';').shift();
         };
-        getToken();
 
+        const accessToken = getAccessTokenFromCookie(); // 쿠키에서 jwtAccessToken 추출
+
+        if (accessToken) {
+            // JWT 토큰을 세션 스토리지에 저장
+            sessionStorage.setItem('accessToken', accessToken);
+            setIsLogin(accessToken); // 로그인 상태 업데이트
+
+            // 쿠키를 삭제합니다.
+            document.cookie = "JwtAccessToken=; Max-Age=0; Path=/; SameSite=Strict"; // 'JwtAccessToken' 삭제
+
+            navigate('/'); // 메인 페이지로 리다이렉트
+        } else {
+            console.error('토큰이 쿠키에 포함되지 않았습니다.');
+        }
     }, []);
-    return <Loading />
+
+    return <Loading />; // 로딩 중일 때 보여줄 컴포넌트
 };
 
 export default OAuthCallback;

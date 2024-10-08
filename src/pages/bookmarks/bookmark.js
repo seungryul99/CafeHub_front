@@ -21,15 +21,17 @@ function Bookmark() {
             KakaoLogin();
         }
         const initialToken = sessionStorage.getItem("accessToken")
+        console.log("access Token = " + initialToken)
 
         axios.get(`${process.env.REACT_APP_APIURL}/api/auth/bookmarks`, {
             headers: {
                 'Authorization': initialToken
-            }
+            },
+            withCredentials: true
         })
             .then(response => {
                 setDataList(response.data.data);
-                console.log(response)
+                console.log(response);
             })
             .catch(error => {
                 console.error('Error fetching data: ', error);

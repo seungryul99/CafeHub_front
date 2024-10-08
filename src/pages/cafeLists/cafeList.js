@@ -9,7 +9,7 @@ import img_meetingTitle from "../../asset/img/img_meetingTitle.png"
 
 import img_star from "../../asset/img/img_star.png"
 import { ReactComponent as Icon_cafe } from "../../asset/icon/icon_cafe.svg"
-import SortedType from "../../components/sortedType"
+import SortedType, {btnDataList} from "../../components/sortedType"
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { useEffect, useState, useMemo } from "react";

@@ -35,10 +35,13 @@ function MyPage({setSelectedId, setIsLogin}) {
         if (sessionStorage.getItem('accessToken') === null) {
             KakaoLogin();
         }
+
+        console.log(token + '토큰있다')
         axios.get(`${process.env.REACT_APP_APIURL}/api/auth/mypage`, {
             headers: {
                 'Authorization': token
-            }
+            },
+            withCredentials: true
         })
             .then(res => {
                 setUserData(res.data.data)
