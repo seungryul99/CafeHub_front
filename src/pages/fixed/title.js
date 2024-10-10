@@ -9,7 +9,7 @@ function Title({setSelectedId, isLogin }){
 
     const SocialKakao = ()=> {
 
-        const kakaoURL = 'http://localhost:8080/api/member/login';
+        const kakaoURL = 'http://localhost:8080/api/member/login/kakao';
 
         const HandleLogin = () => {
             // 카카오 로그인 요청을 서버로 보낸 후 서버가 리다이렉트 URL을 응답함

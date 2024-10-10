@@ -21,7 +21,6 @@ function Bookmark() {
             KakaoLogin();
         }
         const initialToken = sessionStorage.getItem("accessToken")
-        console.log("access Token = " + initialToken)
 
         axios.get(`${process.env.REACT_APP_APIURL}/api/auth/bookmarks`, {
             headers: {
@@ -30,8 +29,8 @@ function Bookmark() {
             withCredentials: true
         })
             .then(response => {
-                setDataList(response.data.data);
-                console.log(response);
+                console.log(response)
+                setDataList(response.data.data.cafeList);
             })
             .catch(error => {
                 console.error('Error fetching data: ', error);
@@ -84,7 +83,6 @@ function BookmarkList({ props }) {
             const initialToken = sessionStorage.getItem("accessToken")
 
 
-            console.log("Sending data to server:", data); // 콘솔에 데이터를 출력하여 확인
             axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
                 headers: {
                     'Content-Type': 'application/json',
