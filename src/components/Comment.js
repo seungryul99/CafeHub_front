@@ -48,7 +48,7 @@ const CommentInput = ({ reviewId, commentCnt, setCommentCnt, commentRegisterFlag
             }
             axios.post(`${process.env.REACT_APP_APIURL}/api/auth/reviews/${reviewId}/comment`, data, {
                 headers: {
-                    'Authorization': token,
+                    'Authorization': `Bearer ${token}`
                 }
             })
                 .then(res => {
@@ -93,7 +93,7 @@ const GetComment = ({ props,commentRegisterFlag, setCommentRegisterFlag, current
     const pageLoad = (currentPage) => {
         const config = token ? {
             headers: {
-                'Authorization': token
+                'Authorization': `Bearer ${token}`
             }
         } : {};
 
@@ -182,7 +182,7 @@ const CommentList = ({ data, pageReLoad, setPageReLoad, commentRegisterFlag, set
         const commentId = data.commentId
         axios.post(`${process.env.REACT_APP_APIURL}/api/auth/reviews/${commentId}/delete`, {}, {
             headers: {
-                'Authorization': token
+                'Authorization': `Bearer ${token}`
             }
         })
             .then(res => {

@@ -42,7 +42,7 @@ function CafeDetail() {
         axios.get(`${process.env.REACT_APP_APIURL}/api/cafe/${cafeId}`, {
 
             headers: {
-                'Authorization': token
+                'Authorization': `Bearer ${token}`
             }
         })
             .then(response => {
@@ -93,7 +93,7 @@ function CafeDetail() {
         axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': token
+                'Authorization': `Bearer ${token}`
             }
         })
             .then(res => {

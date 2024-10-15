@@ -49,7 +49,7 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
             console.log("Sending data to server:", data);
             axios.post(`${process.env.REACT_APP_APIURL}/api/auth/cafe/${reviewId}/like`, data, {
                 headers: {
-                    'Authorization': token,
+                    'Authorization': `Bearer ${token}`,
                 }
             })
                 .then(res => {
@@ -112,7 +112,7 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
         const reviewId = props.reviewId
         axios.post(`${process.env.REACT_APP_APIURL}/api/auth/cafe/${reviewId}/delete`, {}, {
             headers: {
-                'Authorization': token,
+                'Authorization': `Bearer ${token}`,
             }
         })
             .then(res => {

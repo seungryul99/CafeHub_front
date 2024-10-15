@@ -46,7 +46,7 @@ function Review() {
     const pageLoad = (currentPage) => {
         const config = token ? {
             headers: {
-                'Authorization': token
+                'Authorization': `Bearer ${token}`
             }
         } : {};
         axios.get(`${process.env.REACT_APP_APIURL}/api/cafe/${cafeId}/reviews/${currentPage}`, config)

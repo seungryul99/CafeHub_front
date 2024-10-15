@@ -39,7 +39,7 @@ function MyPage({setSelectedId, setIsLogin}) {
         console.log(token + '토큰있다')
         axios.get(`${process.env.REACT_APP_APIURL}/api/auth/mypage`, {
             headers: {
-                'Authorization': token
+                'Authorization': `Bearer ${token}`
             },
             withCredentials: true
         })
@@ -57,7 +57,7 @@ function MyPage({setSelectedId, setIsLogin}) {
     const handleLogout = () => {
         axios.post(`${process.env.REACT_APP_APIURL}/api/auth/member/logout`, {}, {
             headers: {
-                'Authorization': token
+                'Authorization': `Bearer ${token}`
             }
         })
             .then(res => {
@@ -88,7 +88,7 @@ function MyPage({setSelectedId, setIsLogin}) {
                 
         axios.post(`${process.env.REACT_APP_APIURL}/api/auth/mypage`, formData, {
             headers: {
-                'Authorization': token,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data'
             },
         })

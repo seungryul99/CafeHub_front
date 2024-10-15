@@ -62,7 +62,7 @@ function WriteReview() {
 
             axios.post(`${process.env.REACT_APP_APIURL}/api/auth/cafe/${cafeId}/review`, formData, {
                 headers: {
-                    'Authorization': token,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
                 },
             })
