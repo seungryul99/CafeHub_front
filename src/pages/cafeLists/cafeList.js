@@ -123,7 +123,7 @@ function CafeListList({props}){
                         <span className={style.cafeTheme}>{props.cafeTheme}</span>
                         <div className={style.starRatingReview}>
                             <img className={style.img_star} src={img_star}></img>
-                            <span className={style.cafeRating}>{props.cafeRating} ({props.cafeReviewNum})</span>
+                            <span className={style.cafeRating}>{Math.round(props.cafeRating *10)/10} ({props.cafeReviewNum})</span>
                         </div>
                     </div>
                 </div>

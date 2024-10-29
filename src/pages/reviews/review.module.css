@@ -19,6 +19,8 @@
     flex-shrink: 0;
 }
 
+
+
 .textOnBg{
     color: #FFF;
     font-family: NanumSquare;
@@ -124,3 +126,19 @@ hr{
 .reviewHR{
     width: 350px;
 }
+
+
+.noReviewsContainer {
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       text-align: center;
+       padding-top: 10vh;
+       color: #828282;
+       font-size: 18px;
+       font-weight: bold;
+       background-color: white;
+       border-radius: 10px;
+       padding-bottom: 90vh;
+       margin-top: 10px;
+   }

@@ -1,33 +1,47 @@
 import axios from "axios";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import style from "./Comment.module.css"
+import style from "./Comment.module.css";
 import Loading from "./loading";
-import { ReactComponent as Icon_setting } from "../asset/icon/icon_setting.svg"
-import { KakaoLogin } from "./kakaoLogins/kakaoLogin";
-
-
+import { ReactComponent as Icon_setting } from "../asset/icon/icon_setting.svg";
+import ModalComponent from './modalComponent';
 
 function Comment({ props, commentCnt, setCommentCnt, pageReLoad, setPageReLoad }) {
-    console.log(props, "이거 이거이거")
     const [commentRegisterFlag, setCommentRegisterFlag] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
-
+    const [modalIsOpen, setModalIsOpen] = useState(false);
 
     return (
         <>
-            <CommentInput reviewId={props.reviewId} commentCnt={commentCnt} setCommentCnt={setCommentCnt}
-                commentRegisterFlag={commentRegisterFlag} setCommentRegisterFlag={setCommentRegisterFlag}
-                setCurrentPage={setCurrentPage} pageReLoad={pageReLoad} setPageReLoad={setPageReLoad}/>
-            {props.commentCnt !== 0 && <GetComment props={props} commentRegisterFlag={commentRegisterFlag} setCommentRegisterFlag={setCommentRegisterFlag} currentPage={currentPage}
-                setCurrentPage={setCurrentPage} pageReLoad={pageReLoad} setPageReLoad={setPageReLoad} />}
+            <CommentInput
+                reviewId={props.reviewId}
+                commentCnt={commentCnt}
+                setCommentCnt={setCommentCnt}
+                commentRegisterFlag={commentRegisterFlag}
+                setCommentRegisterFlag={setCommentRegisterFlag}
+                setCurrentPage={setCurrentPage}
+                pageReLoad={pageReLoad}
+                setPageReLoad={setPageReLoad}
+                setModalIsOpen={setModalIsOpen}
+            />
+            {props.commentCnt !== 0 && <GetComment
+                props={props}
+                commentRegisterFlag={commentRegisterFlag}
+                setCommentRegisterFlag={setCommentRegisterFlag}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                pageReLoad={pageReLoad}
+                setPageReLoad={setPageReLoad}
+                setCommentCnt={setCommentCnt} // 댓글 수 업데이트를 위한 함수 전달
+            />}
+            <ModalComponent modalIsOpen={modalIsOpen} setModalIsOpen={setModalIsOpen} />
         </>
-    )
+    );
 }
 
 export default Comment;
 
-const CommentInput = ({ reviewId, commentCnt, setCommentCnt, commentRegisterFlag, setCommentRegisterFlag, setCurrentPage, pageReLoad, setPageReLoad }) => {
+const CommentInput = ({ reviewId, commentCnt, setCommentCnt, commentRegisterFlag, setCommentRegisterFlag, setCurrentPage, pageReLoad, setPageReLoad, setModalIsOpen }) => {
     const [comment, setComment] = useState('');
 
     const handleChange = (event) => {
@@ -35,29 +49,28 @@ const CommentInput = ({ reviewId, commentCnt, setCommentCnt, commentRegisterFlag
     };
 
     const handleSubmit = async () => {
-        if (sessionStorage.getItem('accessToken') === null) {
-            KakaoLogin();
+        const token = sessionStorage.getItem('accessToken');
+
+        if (!token) {
+            setModalIsOpen(true); // 모달 열기
+            return;
         }
 
-        const token = sessionStorage.getItem('accessToken')
-
         if (comment.trim() !== '') {
-            console.log('Comment submitted:', comment);
             const data = {
                 commentContent: comment
             }
             axios.post(`${process.env.REACT_APP_APIURL}/api/auth/reviews/${reviewId}/comment`, data, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': token
                 }
             })
                 .then(res => {
-                    console.log(res);
                     setComment('');
-                    setCommentCnt(commentCnt + 1);
+                    setCommentCnt(commentCnt + 1); // 댓글 수 증가
                     setCommentRegisterFlag(!commentRegisterFlag);
-                    setCurrentPage(0)
-                    setPageReLoad(!pageReLoad)
+                    setCurrentPage(0);
+                    setPageReLoad(!pageReLoad);
                 })
                 .catch(error => {
                     console.error('Error updating data: ', error);
@@ -78,37 +91,30 @@ const CommentInput = ({ reviewId, commentCnt, setCommentCnt, commentRegisterFlag
                 등록
             </button>
         </div>
-    )
-}
+    );
+};
 
-const GetComment = ({ props,commentRegisterFlag, setCommentRegisterFlag, currentPage, setCurrentPage, pageReLoad, setPageReLoad }) => {
-    console.log(commentRegisterFlag)
-
-
+const GetComment = ({ props, commentRegisterFlag, setCommentRegisterFlag, currentPage, setCurrentPage, pageReLoad, setPageReLoad, setCommentCnt }) => {
     const [ref, inView] = useInView();
     const [isLast, setIsLast] = useState(false);
     const [dataList, setDataList] = useState([]);
-    const token = sessionStorage.getItem('accessToken')
+    const token = sessionStorage.getItem('accessToken');
 
     const pageLoad = (currentPage) => {
         const config = token ? {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': token
             }
         } : {};
 
-        console.log("다시 get 요청!!")
-        axios.get(`${process.env.REACT_APP_APIURL}/api/reviews/${props.reviewId}/comments/${currentPage}`, config)
+        axios.get(`${process.env.REACT_APP_APIURL}/api/optional-auth/reviews/${props.reviewId}/comments/${currentPage}`, config)
             .then(response => {
-                console.log(response.data.data); // 서버 응답 확인@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
                 setIsLast(response.data.data.isLast);
 
                 if (currentPage === 0) {
                     setDataList(response.data.data.comments);
                 } else {
                     setDataList((prevDataList) => [...prevDataList, ...response.data.data.comments]);
-
                 }
             })
             .catch(error => {
@@ -118,108 +124,118 @@ const GetComment = ({ props,commentRegisterFlag, setCommentRegisterFlag, current
 
     useEffect(() => {
         pageLoad(currentPage);
-    }, [currentPage, commentRegisterFlag])
-
+    }, [currentPage, commentRegisterFlag]);
 
     useMemo(() => {
         if (inView) {
             setCurrentPage(prevCurrentPage => prevCurrentPage + 1);
         }
-    }, [inView])
-
+    }, [inView]);
 
     const loadList = () => {
-        if (dataList?.length !== 0 || dataList?.length === 0) {
-            return (
-                <>
-                    <ul>
-                        {dataList?.map((data, index) => (<CommentList key={index} data={data} pageReLoad={pageReLoad} setPageReLoad={setPageReLoad} commentRegisterFlag={commentRegisterFlag} setCommentRegisterFlag={setCommentRegisterFlag}/>))}
-                    </ul>
-                    {isLast ? null : <div ref={ref} className={style.refContainer}><Loading /></div>}
-                </>
-            );
-        } else {
-            return <Loading />;
-        }
+        return (
+            <>
+                <ul>
+                    {dataList?.map((data, index) => (
+                        <CommentList
+                            key={index}
+                            data={data}
+                            pageReLoad={pageReLoad}
+                            setPageReLoad={setPageReLoad}
+                            commentRegisterFlag={commentRegisterFlag}
+                            setCommentRegisterFlag={setCommentRegisterFlag}
+                            dataList={dataList}
+                            setDataList={setDataList}
+                            setCommentCnt={setCommentCnt} // 댓글 수 업데이트를 위한 함수 전달
+                        />
+                    ))}
+                </ul>
+                {isLast ? null : <div ref={ref} className={style.refContainer}><Loading /></div>}
+            </>
+        );
     };
 
     return (
-
         <div style={{ width: '100%' }}>
             {loadList()}
         </div>
-    )
-
+    );
 }
 
-
-
-const CommentList = ({ data, pageReLoad, setPageReLoad, commentRegisterFlag, setCommentRegisterFlag }) => {
-    console.log(data)
-    const [isDropMenuOpen, setIsDropMenuOpen] = useState(false)
-    const token = sessionStorage.getItem('accessToken')
-
+const CommentList = ({ data, pageReLoad, setPageReLoad, commentRegisterFlag, setCommentRegisterFlag, dataList, setDataList, setCommentCnt }) => {
+    const [isDropMenuOpen, setIsDropMenuOpen] = useState(false);
+    const token = sessionStorage.getItem('accessToken');
 
     const toggleDropMenu = (e) => {
-        e.stopPropagation(); // 이벤트 캡처링 방지
+        e.stopPropagation();
         setIsDropMenuOpen(prevState => !prevState);
-    }
+    };
+
     const toggleDropMenuDown = (e) => {
-        e.stopPropagation(); // 이벤트 캡처링 방지
+        e.stopPropagation();
         setIsDropMenuOpen(false);
-    }
+    };
+
     const commentManagementCheck = () => {
         return (
             <>
-                {data.commentManagement && <span className={style.settingIconWrapper} onClick={toggleDropMenu}>
-                    <Icon_setting fill="#828282" /></span>}
+                {data.commentManagement && (
+                    <span className={style.settingIconWrapper} onClick={toggleDropMenu}>
+                        <Icon_setting fill="#828282" />
+                    </span>
+                )}
             </>
-        )
-    }
+        );
+    };
 
     const deleteComment = () => {
-        console.log(data.reviewId, "asd")
-        const commentId = data.commentId
-        axios.post(`${process.env.REACT_APP_APIURL}/api/auth/reviews/${commentId}/delete`, {}, {
+        const commentId = data.commentId;
+        const reviewId = data.reviewId;
+
+        axios.delete(`${process.env.REACT_APP_APIURL}/api/auth/review/${reviewId}/comment/${commentId}`, {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': token
             }
         })
             .then(res => {
-                console.log(res);
-                setPageReLoad(!pageReLoad)
-                setCommentRegisterFlag(!commentRegisterFlag)
+                // 댓글 삭제 후 댓글 수 감소
+                setCommentCnt(prevCount => prevCount - 1); // 댓글 수 감소
+                setDataList((prevDataList) => prevDataList.filter(comment => comment.commentId !== commentId));
+                setPageReLoad(!pageReLoad);
+                setCommentRegisterFlag(!commentRegisterFlag);
             })
             .catch(error => {
-                console.error('Error updating data: ', error);
-
+                console.error('Error deleting comment: ', error);
             });
-    }
+    };
 
     return (
-        <>
-            <li className={style.flexLine} onClick={toggleDropMenuDown}>
-                <article className={style.nicknameAndDateWrapper}>
-                    <div>
-                        <span className={style.nickname}>{data.nickname}</span>
-                        <span className={style.commentDate}>{data.commentDate}</span>
-                    </div>
-                    {commentManagementCheck()}
-                    {isDropMenuOpen && (
-                        <ul className={style.dropMenuContainer}>
-                            <li className={style.dropMenuWrapper} onClick={deleteComment}>
-                                <span>삭제</span>
-                            </li>
-                        </ul>)}
-                </article>
+        <li className={style.flexLine} onClick={toggleDropMenuDown}>
+            <article className={style.nicknameAndDateWrapper}>
+                {data.commentWriterProfile && (
+                    <img
+                        src={data.commentWriterProfile}
+                        alt={`${data.nickname}'s profile`}
+                        className={style.profileImage}
+                    />
+                )}
+                <div>
+                    <span className={style.nickname}>{data.nickname}</span>
+                    <span className={style.commentDate}>{data.commentDate}</span>
+                </div>
+                {commentManagementCheck()}
+                {isDropMenuOpen && (
+                    <ul className={style.dropMenuContainer}>
+                        <li className={style.dropMenuWrapper} onClick={deleteComment}>
+                            <span>삭제</span>
+                        </li>
+                    </ul>
+                )}
+            </article>
 
-                <article className={style.contentWrapper}>
-                    <span className={style.content}>{data.commentContent}</span>
-                </article>
-
-            </li>
-        </>
-
-    )
-
-}
+            <article className={style.contentWrapper}>
+                <span className={style.content}>{data.commentContent}</span>
+            </article>
+        </li>
+    );
+};

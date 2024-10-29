@@ -12,12 +12,14 @@ import "react-image-gallery/styles/css/image-gallery.css";
 import ReactModal from "react-modal";
 import { KakaoLogin } from "./kakaoLogins/kakaoLogin";
 import ModalComponent from "./modalComponent";
+import Loading from '../components/loading';
 
 function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, cafeName, displayComment }) {
-    console.log("리뷰리스트", props)
+
     //리뷰가 3줄이 넘어가면 더보기 띄우기
     const navigate = useNavigate();
     const token = sessionStorage.getItem('accessToken')
+
 
     const [showMore, setShowMore] = useState(false);
     const toggleShowMore = () => {
@@ -26,7 +28,7 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
     const reviewContent = props.reviewContent;
     const reviewContentLines = reviewContent.match(/.{1,27}/g);
     const displayContentLines = showMore ? reviewContentLines : reviewContentLines.slice(0, 3);
-    const photoUrls = props.photoUrls.map(photo => photo.photoUrl);
+    const photoUrls = (props.photoUrls || []).map(photo => photo);
     const displyCommentBtn = displayComment;
     //
     const [reviewLike, setReviewLike] = useState(props.likeChecked);
@@ -35,6 +37,8 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
     const [initialized, setInitialized] = useState(false);
 
     const [commentCnt, setCommentCnt] = useState(props.commentCnt);
+    const [loading, setLoading] = useState(false); // 로딩 상태 추가
+
 
     useEffect(() => {
         if (initialized) {
@@ -43,13 +47,14 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
             }
             const reviewId = props.reviewId;
             const data = {
+                reviewId : reviewId,
                 reviewLike: reviewLike
             };
 
             console.log("Sending data to server:", data);
-            axios.post(`${process.env.REACT_APP_APIURL}/api/auth/cafe/${reviewId}/like`, data, {
+            axios.post(`${process.env.REACT_APP_APIURL}/api/auth/review/like`, data, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': token
                 }
             })
                 .then(res => {
@@ -108,21 +113,34 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
     }
 
     const deleteReview = () => {
-        console.log(props.reviewId, "asd")
-        const reviewId = props.reviewId
-        axios.post(`${process.env.REACT_APP_APIURL}/api/auth/cafe/${reviewId}/delete`, {}, {
+        setLoading(true); // 로딩 시작
+
+        const reviewId = props.reviewId;
+
+        axios({
+            method: 'delete',
+            url: `${process.env.REACT_APP_APIURL}/api/auth/review`,
             headers: {
-                'Authorization': `Bearer ${token}`,
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            },
+            data: {
+                reviewId: reviewId,
+                cafeId: cafeId
             }
         })
             .then(res => {
                 console.log(res);
-                setPageReLoad(!pageReLoad)
+                setPageReLoad(!pageReLoad);
             })
             .catch(error => {
-                console.error('Error updating data: ', error);
+                console.error('Error deleting review: ', error);
+            })
+            .finally(() => {
+                setLoading(false); // 로딩 종료
             });
-    }
+    };
+
     const updateReview = () => {
         navigate('/updateReview', {
             state: {
@@ -164,7 +182,7 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
             onClick={onClick}
             aria-label="Previous Slide"
         >
-            &#9664; 
+            &#9664;
         </button>
     );
 
@@ -176,80 +194,98 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
             onClick={onClick}
             aria-label="Next Slide"
         >
-            &#9654; 
+            &#9654;
         </button>
     );
 
 
     return (
         <li className={style.bestReviewflexLine} onClick={toggleDropMenuDown}>
-            <div className={style.ReviewFlexLineWrapper}>
-                <div className={style.authorNameDate}>
-                    <div className={style.authorNameDateWrapper}>
-                        <span className={style.authorName}>{props.author}</span>
-                        <span className={style.authorDate}>{props.reviewCreateAt}</span>
+            {/* 로딩 중일 때 로딩 스피너 표시 */}
+            {loading ? (
+                <Loading />  // 로딩 중일 때는 로딩 스피너만 보이도록
+            ) : (
+                <div className={style.ReviewFlexLineWrapper}>
+                    <div className={style.authorNameDate}>
+                        <div className={style.authorNameDateWrapper}>
+                            <img src={props.authorProfile} className={style.authorProfile} />
+                            <span className={style.authorName}>{props.author}</span>
+                            <span className={style.authorDate}>{props.reviewCreateAt}</span>
+                        </div>
+                        {reviewManagementCheck()}
                     </div>
-                    {reviewManagementCheck()}
-                </div>
-                {isDropMenuOpen && (
-                    <ul className={style.dropMenuContainer}>
-                        <li className={style.dropMenuWrapper} onClick={updateReview}>
-                            <span>수정</span>
-                        </li>
-                        <li className={style.dropMenuWrapper} onClick={deleteReview}>
-                            <span>삭제</span>
-                        </li>
-                    </ul>
-                )}
-                <Rating rating={props.reviewRating} size={{ width: '25px', height: '25px' }} />
+                    {isDropMenuOpen && (
+                        <ul className={style.dropMenuContainer}>
+                            <li className={style.dropMenuWrapper} onClick={deleteReview}>
+                                <span>삭제</span>
+                            </li>
+                        </ul>
+                    )}
+                    <Rating rating={props.reviewRating} size={{ width: '25px', height: '25px' }} />
 
+                    {photoUrls && photoUrls.length > 0 && (
+                        <div className={style.photoContainer}>
+                            {photoUrls.slice(0, 3).map((url, index) => (
+                                <img key={index} src={url} alt={`Review photo ${index + 1}`} className={style.reviewPhoto} onClick={() => openModal(index)} />
+                            ))}
+                            {photoUrls.length > 3 && (
+                                <div className={style.morePhotosContainer} onClick={() => openModal(2)}>
+                                    <img src={photoUrls[2]} alt="More photos" className={style.reviewPhoto} style={{ opacity: 0.5 }} />
+                                    <div className={style.morePhotosOverlay}>+{photoUrls.length - 3}</div>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-                {photoUrls && photoUrls?.length > 0 && (
-                    <div className={style.photoContainer}>
-                        {photoUrls.slice(0, 3).map((url, index) => (
-                            <img key={index} src={url} alt={`Review photo ${index + 1}`} className={style.reviewPhoto} onClick={() => openModal(index)} />
+                    <div className={style.reviewContentContainer}>
+                        {displayContentLines.map((line, index) => (
+                            <span key={index} className={style.reviewContent}>
+                            {line}
+                                <br />
+                        </span>
                         ))}
-                        {photoUrls.length > 3 && (
-                            <div className={style.morePhotosContainer} onClick={() => openModal(2)}>
-                                <img src={photoUrls[2]} alt="More photos" className={style.reviewPhoto} style={{ opacity: 0.5 }} />
-                                <div className={style.morePhotosOverlay}>+{photoUrls.length - 3}</div>
-                            </div>
+                        {reviewContentLines.length > 3 && (
+                            <span className={style.viewMore} onClick={toggleShowMore}>
+                            {showMore ? (
+                                <span style={{ lineHeight: '25px' }}>간략히 보기</span>
+                            ) : (
+                                <span style={{ lineHeight: '25px' }}>. . . 더보기</span>
+                            )}
+                        </span>
                         )}
                     </div>
-                )}
-
-
-                <div className={style.reviewContentContainer}>
-                    {displayContentLines.map((line, index) => (
-                        <span key={index} className={style.reviewContent}>
-                            {line}
-                            <br />
-                        </span>
-                    ))}
-                    {reviewContentLines.length > 3 && (
-                        <span className={style.viewMore} onClick={toggleShowMore}>
-                            {showMore ?
-                                <span style={{ lineHeight: '25px' }}>. . . 간략히 보기</span> : <span style={{ lineHeight: '25px' }}>. . . 더보기</span>}
-                        </span>
-                    )}
-                </div>
-                <div className={style.reviewCommentLikeContainer} style={{ marginTop: '20px' }}>
-                    {displyCommentBtn &&
-                        <div style={{ display: 'flex', cursor: 'pointer', color: `${commentBtnColor}` }} onClick={openComment}>
-                            <Icon_comment fill={commentBtnColor} style={{ width: '16px', height: '14px' }} />
-                            {props.commentCnt === 0 ? (<span className={style.comment} >댓글 달기</span>) :
-                                (<span className={style.comment} >댓글 <span style={{ color: `${commentCntColor}` }}>({commentCnt})</span></span>)}
+                    <div className={style.reviewCommentLikeContainer} style={{ marginTop: '20px' }}>
+                        {displyCommentBtn && (
+                            <div style={{ display: 'flex', cursor: 'pointer', color: `${commentBtnColor}` }} onClick={openComment}>
+                                <Icon_comment fill={commentBtnColor} style={{ width: '16px', height: '14px' }} />
+                                {props.commentCnt === 0 ? (
+                                    <span className={style.comment}>댓글 달기</span>
+                                ) : (
+                                    <span className={style.comment}>
+                                    댓글 <span style={{ color: `${commentCntColor}` }}>({commentCnt})</span>
+                                </span>
+                                )}
+                            </div>
+                        )}
+                        <div className={style.checkReviewLikeWrapper} style={{ display: 'flex' }}>
+                            <CheckReviewLike />
+                            <span>{reviewLikeCnt}</span>
                         </div>
-                    }
-                    <div className={style.checkReviewLikeWrapper} style={{ display: 'flex' }}>
-                        {<CheckReviewLike />}
-                        <span>{reviewLikeCnt}</span>
+                    </div>
+                    {commentOpen && (
+                        <Comment
+                            props={props}
+                            commentCnt={commentCnt}
+                            setCommentCnt={setCommentCnt}
+                            pageReLoad={pageReLoad}
+                            setPageReLoad={setPageReLoad}
+                        />
+                    )}
+                    <div className={style.reviewHRContainer} style={{ marginTop: '6px' }}>
+                        <hr className={style.reviewHR} />
                     </div>
                 </div>
-                {commentOpen && <Comment props={props} commentCnt={commentCnt} setCommentCnt={setCommentCnt} pageReLoad={pageReLoad} setPageReLoad={setPageReLoad} />}
-                <div className={style.reviewHRContainer} style={{ marginTop: '6px' }}><hr className={style.reviewHR} /></div>
-
-            </div>
+            )}
 
             <ReactModal
                 isOpen={modalIsOpen}
@@ -260,15 +296,23 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
                 ariaHideApp={false}
             >
                 <div className={style.modalExit} onClick={closeModal}>X</div>
-                <ImageGallery items={images} startIndex={indexOfClickedImage} showThumbnails={false}
-                    showFullscreenButton={false} showPlayButton={false} style={{ WebkitUserDrag: 'none' }}
+                <ImageGallery
+                    items={images}
+                    startIndex={indexOfClickedImage}
+                    showThumbnails={false}
+                    showFullscreenButton={false}
+                    showPlayButton={false}
+                    style={{ WebkitUserDrag: 'none' }}
                     renderLeftNav={renderLeftNav}
-                    renderRightNav={renderRightNav} />
+                    renderRightNav={renderRightNav}
+                />
             </ReactModal>
 
             {loginModalOpen && <ModalComponent modalIsOpen={loginModalOpen} setModalIsOpen={setLoginModalOpen}></ModalComponent>}
         </li>
-    )
+    );
+
+
 
 }
 export default ReviewList;

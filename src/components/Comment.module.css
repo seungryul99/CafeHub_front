@@ -40,11 +40,13 @@
     margin-left: 25px;
 }
 .nicknameAndDateWrapper{
-    width: 238px;
+    width: 280px;
     margin-top: 20px;
     display: flex;
     position: relative;
-    justify-content: space-between;
+    /*justify-content: space-between;*/
+    justify-content: flex-start; /* 왼쪽 정렬로 변경 */
+    align-items: center; /* 추가: 수직 정렬을 중앙으로 */
 }
 .nickname{
     font-family: NanumSquareOTF;
@@ -52,7 +54,7 @@
     font-weight: 700;
     letter-spacing: -0.6px;
     line-height: 12px;
-
+    margin-left: 28px;
 
 }
 .commentDate{
@@ -68,6 +70,13 @@
 
 }
 
+.profileImage {
+    width: 25px; /* 원하는 너비 */
+    height: 25px; /* 원하는 높이 */
+    border-radius: 50%; /* 둥글게 만들기 */
+    margin-right: -20px; /* 닉네임과의 간격 */
+}
+
 .contentWrapper{
     margin-top: 10px;
     width: 255px;
@@ -77,18 +86,24 @@
     font-size: 12px;
     font-weight: 300;
     letter-spacing: 0.2px;
-    line-height: 15px;
-
+    line-height: 18px;
+    margin-left: 3px;
+    white-space: normal; /* 기본 설정으로 줄바꿈을 허용 */
+    word-wrap: break-word; /* 긴 단어가 있는 경우 줄바꿈 허용 */
+    overflow-wrap: break-word; /* 줄바꿈을 위해 추가된 속성 */
 
 }
 
+
+/*댓글관리 버튼*/
 .settingIconWrapper{
     display: flex;
     justify-content: center;
     width: 20px;
     height: 20px;
-    margin-left: 15px;
-    
+    margin-left: 10px;
+    margin-top: 0px;
+    position: relative;
   }
 
   .dropMenuContainer{
@@ -113,3 +128,5 @@
     color: #FFF;
     background: #FF4F4F;
   }
+
+

@@ -18,7 +18,7 @@ function Review() {
     const cafeId = location.state?.cafeId;
     const cafePhotoUrl = location.state?.cafePhotoUrl;
     const cafeName = location.state?.cafeName;
-    
+
     const [dataList, setDataList] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [pageReLoad, setPageReLoad] = useState(false);
@@ -46,19 +46,20 @@ function Review() {
     const pageLoad = (currentPage) => {
         const config = token ? {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': token
             }
         } : {};
-        axios.get(`${process.env.REACT_APP_APIURL}/api/cafe/${cafeId}/reviews/${currentPage}`, config)
+        axios.get(`${process.env.REACT_APP_APIURL}/api/optional-auth/cafe/${cafeId}/reviews/${currentPage}`, config)
             .then(response => {
                 console.log(response)
-                setIsLast(response.data.isLast);
-                setCafeReviewCnt(response.data.cafeReviewCnt)
-                setCafeRating(response.data.cafeRating)
+                setIsLast(response.data.data.isLast);
+                setCafeReviewCnt(response.data.data.cafeReviewCnt)
+                setCafeRating(response.data.data.cafeRating)
                 if (currentPage === 0) {
-                    setDataList(response.data.reviewList);
+                    setDataList(response.data.data.reviewList);
+                    console.log(response.data.data.reviewList)
                 } else {
-                    setDataList(prevDataList => [...prevDataList, ...response.data.reviewList]);
+                    setDataList(prevDataList => [...prevDataList, ...response.data.data.reviewList]);
                 }
             })
             .catch(error => {
@@ -72,13 +73,21 @@ function Review() {
             return (
                 <>
                     <ul>
-                        {dataList?.map((data, index) => (<ReviewList key={index} props={data} pageReLoad={pageReLoad} setPageReLoad={setPageReLoad} cafeId={cafeId} cafePhotoUrl={cafePhotoUrl} cafeName={cafeName} displayComment={displayComment}/>))}
+                        {dataList?.map((data, index) => (<ReviewList key={index} props={data}
+                                                                     pageReLoad={pageReLoad}
+                                                                     setPageReLoad={setPageReLoad}
+                                                                     cafeId={cafeId}
+                                                                     cafePhotoUrl={cafePhotoUrl}
+                                                                     cafeName={cafeName}
+                                                                     displayComment={displayComment}/>))}
                     </ul>
                     {isLast ? null : <div ref={ref} className={style.refContainer}><Loading ref={ref} /></div>}
                 </>
             );
         } else {
-            return <Loading />;
+
+            return <div className={style.noReviewsContainer}>아직 리뷰가 없습니다</div>
+            // return <Loading />;
         }
     };
 

@@ -26,7 +26,7 @@
 
             axios.get(`${process.env.REACT_APP_APIURL}/api/auth/bookmarks`, {
                 headers: {
-                    'Authorization': `Bearer ${initialToken}`
+                    'Authorization': initialToken
                 },
                 withCredentials: true
             })
@@ -90,7 +90,7 @@
                 axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${initialToken}`
+                        'Authorization': initialToken
                     }
                 })
                     .then(res => {
@@ -128,7 +128,7 @@
                         <span className={style.cafeTheme}>{props.cafeTheme}</span>
                         <div className={style.starRatingReview}>
                             <img className={style.img_star} src={img_star}></img>
-                            <span className={style.cafeRating}>{props.cafeRating} ({props.cafeReviewNum})</span>
+                            <span className={style.cafeRating}>{Math.round(props.cafeRating*10)/10} ({props.cafeReviewNum})</span>
                         </div>
                     </div>
                     <div className={styles.likeContainer} style={{ cursor: 'pointer' }} onClick={changeColor}>

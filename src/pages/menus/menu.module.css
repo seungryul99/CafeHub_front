@@ -1,4 +1,4 @@
-.contentContainer{
+.contentContainer {
     width: 100%;
     height: auto;
     display: flex;
@@ -8,51 +8,64 @@
     background-color: rgb(255, 255, 255);
 }
 
-.contentWrapper{
+.contentWrapper {
     display: flex;
     flex-direction: column;
     width: 350px;
     height: auto;
     margin-bottom: 40px;
 }
-.classify_first{
+
+.menuHeader {
+    display: flex;
+    justify-content: space-between; /* Beverage와 X 버튼을 양 끝에 배치 */
+    align-items: center; /* 버튼과 텍스트 수직 정렬 */
+    width: 100%;
+}
+
+.classify_first {
     margin-top: 40px;
-    font-family: NanumSquareOTF;
-    font-size: 20px;
-    font-weight: 1000;
-    letter-spacing: -0.6px;
-    margin-bottom: 20px;
-
-}
-.classify{
-    font-family: NanumSquareOTF;
     font-size: 20px;
     font-weight: 1000;
     letter-spacing: -0.6px;
     margin-bottom: 20px;
 }
 
-.listWrapper{
+.classify {
+    font-size: 20px;
+    font-weight: 1000;
+    letter-spacing: -0.6px;
+    margin-bottom: 20px;
+}
+
+.listWrapper {
     display: flex;
     text-align: center;
     justify-content: space-between;
     margin-top: 20px;
     margin-left: 50px;
     width: 250px;
-
 }
 
-.menuName{
-    font-family: NanumSquareOTF;
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: -0.6px;
-
-}
-
-.price{
-    font-family: NanumSquareOTF;
+.menuName {
     font-size: 17px;
     font-weight: 700;
     letter-spacing: -0.6px;
 }
+
+.price {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.6px;
+}
+
+.backButton {
+    background-color: transparent;
+    border: none;
+    font-size: 20px; /* 크기를 조정 */
+    font-weight: bold;
+    cursor: pointer;
+    color: #ACABB0; /* 옅은 회색으로 버튼 색상 설정 */
+    margin-top: 20px; /* 버튼을 아래로 내림 */
+}
+

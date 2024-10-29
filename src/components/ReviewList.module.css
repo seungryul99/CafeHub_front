@@ -2,6 +2,7 @@
     width: 340px;
     height: auto;
     margin-left: 45px;
+    margin-top: 15px;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -10,19 +11,36 @@
     width: auto;
     height: 12px;
     display: flex;
-    margin-bottom: 2px;
+    margin-bottom: 10px;
     justify-content: space-between;
 }
+
+
+
+
 .bestReviewflexLine{
     width: 100%;
     height: auto;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 
 }
-.authorNameDateWrapper{
-  width: auto;
-  height: auto;
+.authorNameDateWrapper {
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
 }
+
+
+.authorProfile {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%; /* 원형으로 자르기 */
+    object-fit: cover;
+    margin-right: 7px; /* 이름과 이미지 간격 */
+    border: 1px solid rgba(0, 0, 0, 0.2); /* 아주 옅은 그레이 구분선 */
+}
+
 .authorName{
     font-family: NanumSquareOTF;
     width: auto;
@@ -40,17 +58,19 @@
     margin-left: 8px;
 }
 
+/*리뷰 관리 버튼*/
 .settingIconWrapper{
   display: flex;
   justify-content: center;
   width: 20px;
   height: 20px;
+    cursor: pointer;
 }
 
 .reviewContentContainer{
     width: 320px;
     height: auto;
-    margin-top: 7px;
+    margin-top: 20px;
 }
 
   .reviewContent{
@@ -59,8 +79,6 @@
     font-weight: 300;
     letter-spacing: -0.6px;
     line-height: 20px;
-
-
   }
  
   .viewMore{
@@ -87,10 +105,10 @@
   .checkReviewLikeWrapper{
     display: flex;
     margin-left: auto;
+      margin-top: -8px;
   }
 
   .comment{
-    
     margin-left: 5px;
   }
 
@@ -98,6 +116,7 @@ hr{
     background:#E2E1E5;
     height:1px;
     border:0;
+    margin-bottom: 18px;
 }
 .reviewHRContainer {
     margin-top: 11px;
@@ -116,7 +135,6 @@ hr{
   position: absolute;
   top: 18px;
   right: 5px;
-
 }
 
 .dropMenuWrapper{
@@ -129,6 +147,7 @@ hr{
   border-radius: 6px;
   margin-bottom: 5px;
   font-family: NanumSquareOTF;
+    cursor:pointer;
 }
 .dropMenuWrapper:hover{
   color: #FFF;
@@ -181,8 +200,8 @@ hr{
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  width: 300px;
+  /*box-shadow: 0 5px 15px rgba(0, 0, 0, 0);*/
+  width: 340px;
   height: 300px;
 
 }
@@ -208,7 +227,7 @@ hr{
 }
 
 .custom-arrow::before {
-  font-size: 20px; /* 아이콘 크기 조정 */
+  font-size: 30px; /* 아이콘 크기 조정 */
   color: white; /* 아이콘 색상 */
 }
 

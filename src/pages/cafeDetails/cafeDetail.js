@@ -24,31 +24,37 @@ function CafeDetail() {
     const displayComment = false;
 
     const [cafeData, setCafeData] = useState({
+        cafeId : "",
         cafePhotoUrl: "",
         cafeName: "",
         cafeTheme: "",
-        cafeRating: "",
         cafeReviewCnt: "",
+        cafeOperationHour: "",
         cafeAddress: "",
         cafePhone: "",
-        cafeOperationHour: "",
+        cafeRating: "",
+        bookmarkChecked: false,
         bestMenuList: [],
-        bestReviewList: [],
-        bookmarkChecked: false
+        bestReviewList: []
     });
 
     const pageLoad = () => {
 
-        axios.get(`${process.env.REACT_APP_APIURL}/api/cafe/${cafeId}`, {
+        const headers = {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': token } : {}) // AccessToken이 있으면 Authorization 헤더 추가
+        };
 
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
+        axios.get(`${process.env.REACT_APP_APIURL}/api/optional-auth/cafe/${cafeId}`, { headers })
             .then(response => {
+
+                response.data.data.cafeRating = Math.round(response.data.data.cafeRating * 10) / 10;
+
                 setCafeData(response.data.data);
-                console.log(response.data.data)
-                setCafeLike(response.data.data.bookmarkChecked)
+                setCafeLike(response.data.data.bookmarkChecked);
+                console.log("카페 상세페이지 받아옴 : " + response.data.data);
+                console.log("카페 상세페이지 북마크 여부 받아옴 : " + response.data.data.bookmarkChecked);
+                console.log("베스트 리뷰" + response.data.data.bestReviewList)
             })
             .catch(error => {
                 console.error('Error fetching data: ', error);
@@ -93,7 +99,7 @@ function CafeDetail() {
         axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': token
             }
         })
             .then(res => {
@@ -195,7 +201,7 @@ function CafeDetail() {
                         </div>
                     </div>
                     <div className={style.reviewHRContainer}><hr className={style.reviewHR} /></div>
-                    <ul>
+                    <ul >
                         {cafeData.bestReviewList.map((data) => (<ReviewList key={data.reviewId} props={data} displayComment={displayComment}/>))}
                     </ul>
                     <div className={style.reviewPlus}>
