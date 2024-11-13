@@ -23,6 +23,29 @@ function CafeDetail() {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const displayComment = false;
 
+    const getAccessTokenFromCookie = () => {
+        const value = `; ${document.cookie}`;
+        console.log(" value" + value)
+
+        const parts = value.split(`; JwtAccessToken=`);  // 'JwtAccessToken'으로 분리
+        if (parts.length === 2) {
+            return parts.pop().split(';')[0]; // 쿠키에서 토큰 값을 가져옴
+        }
+    };
+
+    // 쿠키에서 리프레시 토큰을 가져오는 함수
+    const getRefreshTokenFromCookie = () => {
+        const value = `; ${document.cookie}`;
+        // console.log(" value" + value)
+        const parts = value.split(`; JwtRefreshToken=`); // 'JwtRefreshToken'으로 분리
+        if (parts.length === 2) {
+            return parts.pop().split(';')[0]; // 쿠키에서 토큰 값을 가져옴
+        }
+        return null; // 리프레시 토큰이 없으면 null 반환
+    };
+
+
+
     const [cafeData, setCafeData] = useState({
         cafeId : "",
         cafePhotoUrl: "",
@@ -38,6 +61,8 @@ function CafeDetail() {
         bestReviewList: []
     });
 
+
+
     const pageLoad = () => {
 
         const headers = {
@@ -52,13 +77,10 @@ function CafeDetail() {
 
                 setCafeData(response.data.data);
                 setCafeLike(response.data.data.bookmarkChecked);
-                console.log("카페 상세페이지 받아옴 : " + response.data.data);
-                console.log("카페 상세페이지 북마크 여부 받아옴 : " + response.data.data.bookmarkChecked);
-                console.log("베스트 리뷰" + response.data.data.bestReviewList)
             })
             .catch(error => {
-                console.error('Error fetching data: ', error);
-            });
+                console.log(error)
+            })
     }
 
     useEffect(() => {

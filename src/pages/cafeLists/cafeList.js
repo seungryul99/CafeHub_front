@@ -20,33 +20,30 @@ import Loading from "../../components/loading";
 function CafeList() {
     const location = useLocation();
     const type = location.state.type;
-    const [sortedType, setSortedType] = useState('name');
+    const [sortedType, setSortedType] = useState('name_asc');
     const [currentPage, setCurrentPage] = useState(0);
-    
+
     const [ref, inView] = useInView();
 
     const [dataList, setDataList] = useState([]);
     const [isLast, setIsLast] = useState(false);
-    
-
 
 
     const pageLoad = (currentPage) => {
         axios.get(`${process.env.REACT_APP_APIURL}/api/cafeList/${type}/${sortedType}/${currentPage}`)
-        .then(response => {
-            const cafeList = response.data.data.cafeList || [];
-            console.log(response)
-            setIsLast(response.data.data.isLast);
-            if (currentPage === 0) {
-                scrollToTop();
-                setDataList(cafeList);
-            } else{
-                setDataList(prevDataList => Array.isArray(prevDataList) ? [...prevDataList, ...cafeList] : cafeList)
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching data: ', error);
-        });
+            .then(response => {
+                const cafeList = response.data.data.cafeList || [];
+                setIsLast(response.data.data.isLast);
+                if (currentPage === 0) {
+                    scrollToTop();
+                    setDataList(cafeList);
+                } else{
+                    setDataList(prevDataList => Array.isArray(prevDataList) ? [...prevDataList, ...cafeList] : cafeList)
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data: ', error);
+            });
     }
 
     useEffect(()=>{
@@ -56,20 +53,21 @@ function CafeList() {
 
     const scrollToTop = () => {
         window.scrollTo(0, 0);
-        console.log('scroll 맨 위로 왜 안돼!!!!')
     }
+
 
     useMemo(()=>{
         if(inView){
             setCurrentPage(prevCurrentPage => prevCurrentPage + 1);
         }
     },[inView])
-    
+
 
     useMemo(()=>{
         setCurrentPage(0);
         pageLoad(currentPage);
     }, [sortedType, type])
+
 
 
     const findTheme = cafeThemeDataList.find(item => item.theme === type);
@@ -116,17 +114,17 @@ function CafeListList({props}){
 
     return (
         <div className={style.flexLine} onClick={func} style={{cursor:'pointer'}}>
-                <img className={style.cafeImg} src={props.cafePhotoUrl}></img>
-                <div className={style.CafeTextContainer}>
-                    <div>
-                        <span className={style.cafeTitle}>{props.cafeName}</span>
-                        <span className={style.cafeTheme}>{props.cafeTheme}</span>
-                        <div className={style.starRatingReview}>
-                            <img className={style.img_star} src={img_star}></img>
-                            <span className={style.cafeRating}>{Math.round(props.cafeRating *10)/10} ({props.cafeReviewNum})</span>
-                        </div>
+            <img className={style.cafeImg} src={props.cafePhotoUrl}></img>
+            <div className={style.CafeTextContainer}>
+                <div>
+                    <span className={style.cafeTitle}>{props.cafeName}</span>
+                    <span className={style.cafeTheme}>{props.cafeTheme}</span>
+                    <div className={style.starRatingReview}>
+                        <img className={style.img_star} src={img_star}></img>
+                        <span className={style.cafeRating}>{Math.round(props.cafeRating *10)/10} ({props.cafeReviewNum})</span>
                     </div>
                 </div>
+            </div>
         </div>
     )
 }
@@ -140,7 +138,7 @@ const cafeThemeDataList = [
 ]
 
 function CafeThemeList({props}) {
-    
+
 
     return(
         <article className={style.containerWrapper}>

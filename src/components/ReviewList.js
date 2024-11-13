@@ -246,8 +246,9 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
                         ))}
                         {reviewContentLines.length > 3 && (
                             <span className={style.viewMore} onClick={toggleShowMore}>
+                                {/*간략히 보기는 일단 없어도 될거 같음*/}
                             {showMore ? (
-                                <span style={{ lineHeight: '25px' }}>간략히 보기</span>
+                                <span style={{ lineHeight: '0px' }}></span>
                             ) : (
                                 <span style={{ lineHeight: '25px' }}>. . . 더보기</span>
                             )}

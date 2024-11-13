@@ -16,7 +16,7 @@ function SortedType({ setSortedType }) {
 
     // 초기 렌더링 시 name이 기본적으로 설정되도록
     useEffect(() => {
-        setSortedType("name");
+        setSortedType("name_asc");
     }, [setSortedType]);
 
     const handleSortChange = (btnId, sortedUrl) => {
@@ -60,9 +60,9 @@ function SortedType({ setSortedType }) {
 export default SortedType;
 
 export const btnDataList = [
-    { btnId: 1, sortedUrl: ["name_d", "name"], icon: Icon_name, btnText: "이름 순" },
-    { btnId: 2, sortedUrl: ["rating_a", "rating"], icon: Icon_rate, btnText: "별점 순" },
-    { btnId: 3, sortedUrl: ["reviewNum_a", "reviewNum"], icon: Icon_review, btnText: "리뷰 개수" }
+    { btnId: 1, sortedUrl: ["name_desc", "name_asc"], icon: Icon_name, btnText: "이름 순" },
+    { btnId: 2, sortedUrl: ["rating_asc", "rating_desc"], icon: Icon_rate, btnText: "별점 순" },
+    { btnId: 3, sortedUrl: ["reviewNum_asc", "reviewNum_desc"], icon: Icon_review, btnText: "리뷰 개수" }
 ];
 
 function BtnList({ props, isSelected, sortedIndex, handleSortChange }) {
