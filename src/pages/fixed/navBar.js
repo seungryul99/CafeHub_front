@@ -45,7 +45,7 @@ export default NavBar;
 
 function NavList({ props, setSelectedId, isSelected, setModalIsOpen }) {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
-    const token = sessionStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
     const navigate = useNavigate();
 
     // 선택된 항목에 따라 색상 변경

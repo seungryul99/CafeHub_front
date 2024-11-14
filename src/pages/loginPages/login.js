@@ -7,7 +7,7 @@ const APIURL = `https://master.d18slmijdq6uhn.amplifyapp.com/`
 function Login() {
     useEffect(() => {
         const fetchData = async () => {
-            const token = sessionStorage.getItem('token');
+            const token = localStorage.getItem('token');
             if (!token) {
                 console.error('No token found');
                 return;

@@ -49,7 +49,7 @@ const CommentInput = ({ reviewId, commentCnt, setCommentCnt, commentRegisterFlag
     };
 
     const handleSubmit = async () => {
-        const token = sessionStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken');
 
         if (!token) {
             setModalIsOpen(true); // 모달 열기
@@ -98,7 +98,7 @@ const GetComment = ({ props, commentRegisterFlag, setCommentRegisterFlag, curren
     const [ref, inView] = useInView();
     const [isLast, setIsLast] = useState(false);
     const [dataList, setDataList] = useState([]);
-    const token = sessionStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
 
     const pageLoad = (currentPage) => {
         const config = token ? {
@@ -164,7 +164,7 @@ const GetComment = ({ props, commentRegisterFlag, setCommentRegisterFlag, curren
 
 const CommentList = ({ data, pageReLoad, setPageReLoad, commentRegisterFlag, setCommentRegisterFlag, dataList, setDataList, setCommentCnt }) => {
     const [isDropMenuOpen, setIsDropMenuOpen] = useState(false);
-    const token = sessionStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
 
     const toggleDropMenu = (e) => {
         e.stopPropagation();

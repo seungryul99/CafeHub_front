@@ -19,7 +19,7 @@ function CafeDetail() {
     const navigate = useNavigate();
     const location = useLocation();
     const cafeId = location.state?.cafeId;
-    const token = sessionStorage.getItem('accessToken')
+    const token = localStorage.getItem('accessToken')
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const displayComment = false;
 

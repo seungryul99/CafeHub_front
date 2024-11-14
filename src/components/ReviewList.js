@@ -18,7 +18,7 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
 
     //리뷰가 3줄이 넘어가면 더보기 띄우기
     const navigate = useNavigate();
-    const token = sessionStorage.getItem('accessToken')
+    const token = localStorage.getItem('accessToken')
 
 
     const [showMore, setShowMore] = useState(false);

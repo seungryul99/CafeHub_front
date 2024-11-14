@@ -23,7 +23,7 @@ function WriteReview() {
     const [detailImgs, setDetailImgs] = useState([]);
     const [loading, setLoading] = useState(false); // 로딩 상태 추가
     const navigate = useNavigate();
-    const token = sessionStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
 
     useEffect(() => {
         if (!token) {

@@ -26,7 +26,7 @@ function Review() {
     const [ref, inView] = useInView();
     const [isLast, setIsLast] = useState(false);
     const navigate = useNavigate();
-    const token = sessionStorage.getItem('accessToken')
+    const token = localStorage.getItem('accessToken')
     const [cafeReviewCnt, setCafeReviewCnt] = useState(0);
     const [cafeRating, setCafeRating] = useState(0);
     const [loginModalOpen, setLoginModalOpen] = useState(false);

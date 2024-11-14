@@ -24,7 +24,7 @@ function MyPage({ setSelectedId, setIsLogin }) {
     const [userProfileImg, setUserProfileImg] = useState(BasicImg);
     const [loading, setLoading] = useState(false);
     const [reRender, setReRender] = useState(false);
-    const token = sessionStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
     const navigate = useNavigate();
 
     useEffect(() => {

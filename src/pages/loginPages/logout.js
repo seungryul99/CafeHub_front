@@ -6,11 +6,11 @@ const Logout = ({ setIsLogin }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const accessToken = sessionStorage.getItem('accessToken'); // 세션 저장소에서 jwtAccessToken 추출
+        const accessToken = localStorage.getItem('accessToken'); // 세션 저장소에서 jwtAccessToken 추출
 
         if (accessToken) {
             // 세션 저장소에서 accessToken 제거
-            sessionStorage.removeItem('accessToken');
+            localStorage.removeItem('accessToken');
             setIsLogin(null); // setIsLogin으로 상태 업데이트
         } else {
             console.error('토큰이 세션 스토리지에 포함되지 않았습니다.');

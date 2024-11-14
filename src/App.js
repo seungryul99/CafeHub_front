@@ -21,7 +21,7 @@ import Logout from "./pages/loginPages/logout";
 function App() {
   const [selectedId, setSelectedId] = useState(1);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [isLogin, setIsLogin] = useState(sessionStorage.getItem('accessToken') ? sessionStorage.getItem('accessToken') : null);
+  const [isLogin, setIsLogin] = useState(localStorage.getItem('accessToken') ? localStorage.getItem('accessToken') : null);
 
   return (
       <div className="App">

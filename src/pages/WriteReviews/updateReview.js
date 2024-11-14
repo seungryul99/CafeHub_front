@@ -14,7 +14,7 @@ function UpdateReview() {
     const ARRAY = [0, 1, 2, 3, 4];
     const [clicked, setClicked] = useState([false, false, false, false, false]);
     const navigate = useNavigate();
-    const token = sessionStorage.getItem('accessToken')
+    const token = localStorage.getItem('accessToken')
 
     const defaultCafePhotoUrl = 'defaultCafePhotoUrl';
     const defaultCafeName = 'defaultCafeName';
@@ -26,7 +26,7 @@ function UpdateReview() {
     const [detailImgs, setDetailImgs] = useState([]);
 
     useEffect(() => {
-        if (sessionStorage.getItem('accessToken') === null) {
+        if (localStorage.getItem('accessToken') === null) {
             KakaoLogin();
         }
         const updatedClicked = ARRAY.map((_, index) => index < reviewRating);

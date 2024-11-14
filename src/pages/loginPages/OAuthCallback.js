@@ -5,6 +5,7 @@ import Loading from '../../components/loading';
 const OAuthCallback = ({ setIsLogin }) => {
     const navigate = useNavigate();
 
+
     useEffect(() => {
         // 쿠키에서 jwtAccessToken을 가져옵니다.
         const getAccessTokenFromCookie = () => {
@@ -16,7 +17,7 @@ const OAuthCallback = ({ setIsLogin }) => {
         const accessToken = getAccessTokenFromCookie(); // 쿠키에서 jwtAccessToken 추출
         if (accessToken) {
             // JWT 토큰을 세션 스토리지에 저장
-            sessionStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('accessToken', accessToken);
             setIsLogin(accessToken); // 로그인 상태 업데이트
 
             // 쿠키를 삭제합니다.

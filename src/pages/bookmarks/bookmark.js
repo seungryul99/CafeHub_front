@@ -17,12 +17,12 @@
         const [dataList, setDataList] = useState([]);
 
         const pageLoad = () => {
-            if (sessionStorage.getItem('accessToken') === null) {
+            if (localStorage.getItem('accessToken') === null) {
                 KakaoLogin();
             }
 
 
-            const initialToken = sessionStorage.getItem("accessToken")
+            const initialToken = localStorage.getItem("accessToken")
 
             axios.get(`${process.env.REACT_APP_APIURL}/api/auth/bookmarks`, {
                 headers: {
@@ -84,7 +84,7 @@
                     cafeId: props.cafeId,
                     bookmarkChecked: like
                 };
-                const initialToken = sessionStorage.getItem("accessToken")
+                const initialToken = localStorage.getItem("accessToken")
 
 
                 axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
