@@ -15,7 +15,7 @@ function Login() {
             try {
                 const response = await axios.get(`${APIURL}/protected-resource`, {
                     headers: {
-                        Authorization: token
+                        Authorization: `Bearer ${token}`
                     },
                 });
                 console.log(response.data);

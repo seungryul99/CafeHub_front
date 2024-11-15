@@ -12,34 +12,78 @@
     import axios from "axios";
     import { KakaoLogin } from "../../components/kakaoLogins/kakaoLogin";
 
+
+    const getAccessTokenFromCookie = () => {
+        const cookies = document.cookie.split('; ').map(cookie => cookie.split('='));
+        const accessTokenCookie = cookies.find(([name]) => name === 'JwtAccessToken');
+
+        if (accessTokenCookie) {
+            // JWT 토큰을 로컬 스토리지에 저장
+            localStorage.setItem('accessToken', accessTokenCookie[1]);
+
+            // 쿠키에서 jwtAccessToken을 삭제합니다.
+            document.cookie = "JwtAccessToken=; Max-Age=0; Path=/; SameSite=Strict";
+
+            return accessTokenCookie[1];
+        }
+        return null;
+    };
     function Bookmark() {
 
         const [dataList, setDataList] = useState([]);
 
-        const pageLoad = () => {
+
+
+
+
+
+        const pageLoad = async () => {
             if (localStorage.getItem('accessToken') === null) {
                 KakaoLogin();
+                return;
             }
 
+            const initialToken = localStorage.getItem("accessToken");
 
-            const initialToken = localStorage.getItem("accessToken")
-
-            axios.get(`${process.env.REACT_APP_APIURL}/api/auth/bookmarks`, {
-                headers: {
-                    'Authorization': initialToken
-                },
-                withCredentials: true
-            })
-                .then(response => {
-                    console.log(response)
-                    setDataList(response.data.data.cafeList);
-                })
-                .catch(error => {
-                    console.error('북마크 리스트 요청시 에러 발생 : ', error);
-
-                    console.log(initialToken)
+            // 첫 요청
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_APIURL}/api/auth/bookmarks`, {
+                    headers: {
+                        'Authorization': `Bearer ${initialToken}`
+                    }
                 });
-        }
+
+                setDataList(response.data.data.cafeList);
+            } catch (error) {
+                console.error('북마크 리스트 요청 시 에러 발생 : ', error);
+
+                // 401 Unauthorized 에러 발생 시 예외 처리
+                if (error.response && error.response.data.code === 'LOGIN_401_1') {
+                    console.log('액세스 토큰 만료, 재발급 시도');
+                    try {
+                        // 리프레시 토큰을 사용하여 새 액세스 토큰 발급 요청
+                        const reissueResponse = await axios.post('/reissue/token', {}, { withCredentials: true });
+
+                        // 새 액세스 토큰을 가져옴
+                        const newAccessToken = getAccessTokenFromCookie();
+                        localStorage.setItem('accessToken', newAccessToken);
+                        console.log('새 토큰 발급 완료');
+
+                        // 새 토큰으로 다시 북마크 요청
+                        const retryResponse = await axios.get(`${process.env.REACT_APP_APIURL}/api/auth/bookmarks`, {
+                            headers: {
+                                'Authorization': `Bearer ${newAccessToken}`
+                            }
+                        });
+
+                        console.log("토큰 재발급 후 요청 성공")
+                        setDataList(retryResponse.data.data.cafeList);
+                    } catch (reissueError) {
+                        console.error('토큰 재발급 실패:', reissueError);
+                    }
+                }
+            }
+        };
 
         useEffect(() => {
             pageLoad();
@@ -77,32 +121,55 @@
         const [like, setLike] = useState(true);
         const [initialized, setInitialized] = useState(false);
         useEffect(() => {
+            const updateBookmark = async () => {
+                if (initialized) {
+                    const data = {
+                        cafeId: props.cafeId,
+                        bookmarkChecked: like
+                    };
+                    const initialToken = localStorage.getItem("accessToken");
 
+                    try {
+                        await axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${initialToken}`
+                            }
+                        });
+                        console.log('Bookmark updated successfully');
+                    } catch (error) {
+                        console.error('북마크 리스트에서 북마크 도중 예외 발생: ', error);
 
-            if (initialized) {
-                const data = {
-                    cafeId: props.cafeId,
-                    bookmarkChecked: like
-                };
-                const initialToken = localStorage.getItem("accessToken")
+                        // 401 Unauthorized 에러 발생 시 예외 처리
+                        if (error.response && error.response.data.code === 'LOGIN_401_1') {
+                            console.log('액세스 토큰 만료, 재발급 시도');
+                            try {
+                                const reissueResponse = await axios.post('/reissue/token', {}, { withCredentials: true });
 
+                                const newAccessToken = getAccessTokenFromCookie();
+                                console.log('새 토큰 발급 완료');
 
-                axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': initialToken
+                                // 새 토큰으로 다시 북마크 요청
+                                await axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${newAccessToken}`
+                                    }
+                                });
+                                console.log('Bookmark updated successfully after reissue');
+                            } catch (reissueError) {
+                                console.error('토큰 재발급 실패:', reissueError);
+                            }
+                        }
                     }
-                })
-                    .then(res => {
-                        console.log(res);
-                    })
-                    .catch(error => {
-                        console.error('Error updating data: ', error);
-                    });
-            } else {
-                setInitialized(true);
-            }
+                } else {
+                    setInitialized(true);
+                }
+            };
+
+            updateBookmark(); // 비동기 함수 호출
         }, [like]);
+
 
 
 

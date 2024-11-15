@@ -14,6 +14,23 @@ import { KakaoLogin } from "./kakaoLogins/kakaoLogin";
 import ModalComponent from "./modalComponent";
 import Loading from '../components/loading';
 
+
+const getAccessTokenFromCookie = () => {
+    const cookies = document.cookie.split('; ').map(cookie => cookie.split('='));
+    const accessTokenCookie = cookies.find(([name]) => name === 'JwtAccessToken');
+
+    if (accessTokenCookie) {
+        // JWT 토큰을 로컬 스토리지에 저장
+        localStorage.setItem('accessToken', accessTokenCookie[1]);
+
+        // 쿠키에서 jwtAccessToken을 삭제합니다.
+        document.cookie = "JwtAccessToken=; Max-Age=0; Path=/; SameSite=Strict";
+
+        return accessTokenCookie[1];
+    }
+    return null;
+};
+
 function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, cafeName, displayComment }) {
 
     //리뷰가 3줄이 넘어가면 더보기 띄우기
@@ -41,32 +58,81 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
 
 
     useEffect(() => {
-        if (initialized) {
-            if (!token) {
-                KakaoLogin();
-            }
-            const reviewId = props.reviewId;
-            const data = {
-                reviewId : reviewId,
-                reviewLike: reviewLike
-            };
-
-            console.log("Sending data to server:", data);
-            axios.post(`${process.env.REACT_APP_APIURL}/api/auth/review/like`, data, {
-                headers: {
-                    'Authorization': token
+        const handleRequest = async () => {
+            try {
+                if (!initialized) {
+                    setInitialized(true);
+                    return;
                 }
-            })
-                .then(res => {
-                    console.log(res);
-                })
-                .catch(error => {
-                    console.error('Error updating data: ', error);
+
+                if (!token) {
+                    KakaoLogin();
+                    return;
+                }
+
+                const reviewId = props.reviewId;
+                const data = {
+                    reviewId: reviewId,
+                    reviewLike: reviewLike
+                };
+
+                console.log("Sending data to server:", data);
+
+                // API 요청
+                const response = await axios.post(`${process.env.REACT_APP_APIURL}/api/auth/review/like`, data, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
-        } else {
-            setInitialized(true);
-        }
+
+                console.log(response);
+
+            } catch (error) {
+                console.error('Error updating data: ', error);
+
+                // 만약 토큰 만료로 인한 401 에러가 발생하면 리프레시 토큰으로 새로운 액세스 토큰 발급 시도
+                if (error.response && error.response.data.code === 'LOGIN_401_1') {
+                    console.log('액세스 토큰 만료 예외 상황 발생');
+                    try {
+                        // 리프레시 토큰을 사용하여 새 액세스 토큰 발급 요청
+                        console.log('쿠키 발사 전');
+
+
+                        const reissueResponse = await axios.post('/reissue/token', {}, { withCredentials: true });
+
+                        console.log('쿠키 발사 후');
+
+                        // 새 액세스 토큰 저장
+                        const newAccessToken = getAccessTokenFromCookie();
+                        console.log('새 토큰 발급 완료');
+
+
+
+                        const reviewId = props.reviewId;
+                        const data = {
+                            reviewId: reviewId,
+                            reviewLike: reviewLike
+                        };
+                        // 새로운 토큰으로 재요청
+                        const retryResponse = await axios.post(`${process.env.REACT_APP_APIURL}/api/auth/review/like`, data, {
+                            headers: {
+                                'Authorization': `Bearer ${newAccessToken}` // 새 토큰 추가
+                            }
+                        });
+
+                        console.log(retryResponse);
+
+                    } catch (reissueError) {
+                        console.error('토큰 재발급 실패:', reissueError);
+                        // 추가적인 에러 처리 (예: 로그아웃 처리)
+                    }
+                }
+            }
+        };
+
+        handleRequest();
     }, [reviewLikeCnt]);
+
 
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const changeReviewLikeColor = () => {
@@ -117,13 +183,17 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
 
         const reviewId = props.reviewId;
 
+        const config = token ? {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        } : {};
+
         axios({
             method: 'delete',
             url: `${process.env.REACT_APP_APIURL}/api/auth/review`,
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            },
+            ...config,
             data: {
                 reviewId: reviewId,
                 cafeId: cafeId
@@ -133,13 +203,43 @@ function ReviewList({ props, pageReLoad, setPageReLoad, cafeId, cafePhotoUrl, ca
                 console.log(res);
                 setPageReLoad(!pageReLoad);
             })
-            .catch(error => {
+            .catch(async (error) => {
                 console.error('Error deleting review: ', error);
+
+                // 401 Unauthorized 에러 처리 (토큰 만료)
+                if (error.response && error.response.data.code === 'LOGIN_401_1') {
+                    console.log('액세스 토큰 만료, 재발급 시도');
+                    try {
+                        // 토큰 재발급 요청
+                        const reissueResponse = await axios.post('/reissue/token', {}, { withCredentials: true });
+                        const newAccessToken = getAccessTokenFromCookie();
+                        console.log('새 토큰 발급 완료');
+
+                        // 새로운 토큰으로 리뷰 삭제 요청 재시도
+                        await axios({
+                            method: 'delete',
+                            url: `${process.env.REACT_APP_APIURL}/api/auth/review`,
+                            headers: {
+                                'Authorization': `Bearer ${newAccessToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            data: {
+                                reviewId: reviewId,
+                                cafeId: cafeId
+                            }
+                        });
+                        console.log('Review deleted successfully after reissue');
+                        setPageReLoad(!pageReLoad);
+                    } catch (reissueError) {
+                        console.error('토큰 재발급 실패:', reissueError);
+                    }
+                }
             })
             .finally(() => {
                 setLoading(false); // 로딩 종료
             });
     };
+
 
     const updateReview = () => {
         navigate('/updateReview', {

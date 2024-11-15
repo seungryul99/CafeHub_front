@@ -32,6 +32,22 @@ function Review() {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const displayComment = true;
 
+    const getAccessTokenFromCookie = () => {
+        const cookies = document.cookie.split('; ').map(cookie => cookie.split('='));
+        const accessTokenCookie = cookies.find(([name]) => name === 'JwtAccessToken');
+
+        if (accessTokenCookie) {
+            // JWT 토큰을 로컬 스토리지에 저장
+            localStorage.setItem('accessToken', accessTokenCookie[1]);
+
+            // 쿠키에서 jwtAccessToken을 삭제합니다.
+            document.cookie = "JwtAccessToken=; Max-Age=0; Path=/; SameSite=Strict";
+
+            return accessTokenCookie[1];
+        }
+        return null;
+    };
+
     useEffect(() => {
         pageLoad(currentPage);
     }, [currentPage, pageReLoad])
@@ -43,29 +59,70 @@ function Review() {
         }
     }, [inView])
 
-    const pageLoad = (currentPage) => {
-        const config = token ? {
-            headers: {
-                'Authorization': token
+    const pageLoad = async (currentPage) => {
+        const token = localStorage.getItem('accessToken');
+
+
+        const config = token ?
+            { headers: { 'Authorization': `Bearer ${token}` } } : {};
+
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_APIURL}/api/optional-auth/cafe/${cafeId}/reviews/${currentPage}`, config);
+
+            // 서버로부터 받은 데이터 처리
+            setIsLast(response.data.data.isLast);
+            setCafeReviewCnt(response.data.data.cafeReviewCnt);
+            setCafeRating(response.data.data.cafeRating);
+
+            if (currentPage === 0) {
+                setDataList(response.data.data.reviewList);
+                console.log(response.data.data.reviewList);
+            } else {
+                setDataList(prevDataList => [...prevDataList, ...response.data.data.reviewList]);
             }
-        } : {};
-        axios.get(`${process.env.REACT_APP_APIURL}/api/optional-auth/cafe/${cafeId}/reviews/${currentPage}`, config)
-            .then(response => {
-                console.log(response)
-                setIsLast(response.data.data.isLast);
-                setCafeReviewCnt(response.data.data.cafeReviewCnt)
-                setCafeRating(response.data.data.cafeRating)
-                if (currentPage === 0) {
-                    setDataList(response.data.data.reviewList);
-                    console.log(response.data.data.reviewList)
-                } else {
-                    setDataList(prevDataList => [...prevDataList, ...response.data.data.reviewList]);
+        } catch (error) {
+            console.error('Error fetching data: ', error);
+
+            // 401 Unauthorized 에러 발생 시 리프레시 토큰을 사용하여 새 액세스 토큰 발급
+            if (error.response && error.response.data.code === 'LOGIN_401_1') {
+                console.log('액세스 토큰 만료 예외 상황 발생');
+                try {
+                    // 리프레시 토큰을 사용하여 새 액세스 토큰 발급 요청
+                    const reissueResponse = await axios.post('/reissue/token', {}, { withCredentials: true });
+
+                    // 새 액세스 토큰 저장
+                    const newAccessToken = getAccessTokenFromCookie();
+                    console.log('새 토큰 발급 완료');
+
+                    // 새로운 토큰으로 재요청
+                    const retryConfig = {
+                        headers: {
+                            'Authorization': `Bearer ${newAccessToken}`
+                        }
+                    };
+
+                    const retryResponse = await axios.get(`${process.env.REACT_APP_APIURL}/api/optional-auth/cafe/${cafeId}/reviews/${currentPage}`, retryConfig);
+
+                    // 서버로부터 받은 데이터 처리
+                    setIsLast(retryResponse.data.data.isLast);
+                    setCafeReviewCnt(retryResponse.data.data.cafeReviewCnt);
+                    setCafeRating(retryResponse.data.data.cafeRating);
+
+                    if (currentPage === 0) {
+                        setDataList(retryResponse.data.data.reviewList);
+                        console.log(retryResponse.data.data.reviewList);
+                    } else {
+                        setDataList(prevDataList => [...prevDataList, ...retryResponse.data.data.reviewList]);
+                    }
+
+                } catch (reissueError) {
+                    console.error('토큰 재발급 실패:', reissueError);
+                    // 추가적인 에러 처리 (예: 로그아웃 처리)
                 }
-            })
-            .catch(error => {
-                console.error('Error fetching data: ', error);
-            });
-    }
+            }
+        }
+    };
+
 
 
     const loadList = () => {

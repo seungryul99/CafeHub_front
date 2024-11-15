@@ -16,12 +16,12 @@ const OAuthCallback = ({ setIsLogin }) => {
 
         const accessToken = getAccessTokenFromCookie(); // 쿠키에서 jwtAccessToken 추출
         if (accessToken) {
-            // JWT 토큰을 세션 스토리지에 저장
+            // JWT 토큰을 로컬 스토리지에 저장
             localStorage.setItem('accessToken', accessToken);
             setIsLogin(accessToken); // 로그인 상태 업데이트
 
             // 쿠키를 삭제합니다.
-            document.cookie = "JwtAccessToken=; Max-Age=0; Path=/; SameSite=Strict"; // 'JwtAccessToken' 삭제
+            document.cookie = "JwtAccessToken=; Max-Age=0; Path=/; SameSite=Strict"; // 'JwtAccessToken'  쿠키에서 삭제
 
             navigate('/'); // 메인 페이지로 리다이렉트
         } else {

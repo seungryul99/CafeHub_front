@@ -28,6 +28,22 @@ function CafeList() {
     const [dataList, setDataList] = useState([]);
     const [isLast, setIsLast] = useState(false);
 
+    const getAccessTokenFromCookie = () => {
+        const cookies = document.cookie.split('; ').map(cookie => cookie.split('='));
+        const accessTokenCookie = cookies.find(([name]) => name === 'JwtAccessToken');
+
+        if (accessTokenCookie) {
+            // JWT 토큰을 로컬 스토리지에 저장
+            localStorage.setItem('accessToken', accessTokenCookie[1]);
+
+            // 쿠키에서 jwtAccessToken을 삭제합니다.
+            document.cookie = "JwtAccessToken=; Max-Age=0; Path=/; SameSite=Strict";
+
+            return accessTokenCookie[1];
+        }
+        return null;
+    };
+
 
     const pageLoad = (currentPage) => {
         axios.get(`${process.env.REACT_APP_APIURL}/api/cafeList/${type}/${sortedType}/${currentPage}`)

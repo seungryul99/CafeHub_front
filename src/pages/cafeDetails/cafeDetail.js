@@ -12,6 +12,7 @@ import WriteReview from '../../asset/icon/icon_nicknameAlt.png';
 import axios from "axios"
 import Rating from "../../components/Rating"
 import ReviewList from "../../components/ReviewList"
+import { KakaoLogin } from '../../components/kakaoLogins/kakaoLogin';
 import ModalComponent from "../../components/modalComponent"
 
 
@@ -22,27 +23,6 @@ function CafeDetail() {
     const token = localStorage.getItem('accessToken')
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const displayComment = false;
-
-    const getAccessTokenFromCookie = () => {
-        const value = `; ${document.cookie}`;
-        console.log(" value" + value)
-
-        const parts = value.split(`; JwtAccessToken=`);  // 'JwtAccessToken'으로 분리
-        if (parts.length === 2) {
-            return parts.pop().split(';')[0]; // 쿠키에서 토큰 값을 가져옴
-        }
-    };
-
-    // 쿠키에서 리프레시 토큰을 가져오는 함수
-    const getRefreshTokenFromCookie = () => {
-        const value = `; ${document.cookie}`;
-        // console.log(" value" + value)
-        const parts = value.split(`; JwtRefreshToken=`); // 'JwtRefreshToken'으로 분리
-        if (parts.length === 2) {
-            return parts.pop().split(';')[0]; // 쿠키에서 토큰 값을 가져옴
-        }
-        return null; // 리프레시 토큰이 없으면 null 반환
-    };
 
 
 
@@ -61,27 +41,82 @@ function CafeDetail() {
         bestReviewList: []
     });
 
+    const getAccessTokenFromCookie = () => {
+        const cookies = document.cookie.split('; ').map(cookie => cookie.split('='));
+        const accessTokenCookie = cookies.find(([name]) => name === 'JwtAccessToken');
+
+        if (accessTokenCookie) {
+            // JWT 토큰을 로컬 스토리지에 저장
+            localStorage.setItem('accessToken', accessTokenCookie[1]);
+
+            // 쿠키에서 jwtAccessToken을 삭제합니다.
+            document.cookie = "JwtAccessToken=; Max-Age=0; Path=/; SameSite=Strict";
+
+            return accessTokenCookie[1];
+        }
+        return null;
+    };
 
 
-    const pageLoad = () => {
+    const pageLoad = async () => {
+        try {
+            // 헤더 설정 (AccessToken이 있으면 Authorization 헤더 추가)
+            const token = localStorage.getItem('accessToken');
+            const headers = {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {}) // AccessToken이 있으면 Authorization 헤더 추가
+            };
 
-        const headers = {
-            'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': token } : {}) // AccessToken이 있으면 Authorization 헤더 추가
-        };
+            // API 요청
+            const response = await axios.get(`${process.env.REACT_APP_APIURL}/api/optional-auth/cafe/${cafeId}`, { headers });
 
-        axios.get(`${process.env.REACT_APP_APIURL}/api/optional-auth/cafe/${cafeId}`, { headers })
-            .then(response => {
+            // 데이터 가공 및 상태 업데이트
+            response.data.data.cafeRating = Math.round(response.data.data.cafeRating * 10) / 10;
+            setCafeData(response.data.data);
+            setCafeLike(response.data.data.bookmarkChecked);
 
-                response.data.data.cafeRating = Math.round(response.data.data.cafeRating * 10) / 10;
+        } catch (error) {
+            console.error('API 요청 실패:', error);
 
-                setCafeData(response.data.data);
-                setCafeLike(response.data.data.bookmarkChecked);
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    }
+            // 만약 토큰 만료로 인한 401 에러가 발생하면 리프레시 토큰으로 새로운 액세스 토큰 발급 시도
+            if (error.response && error.response.data.code === 'LOGIN_401_1') {
+                console.log('액세스 토큰 만료 예외 상황 발생')
+                try {
+                    // 리프레시 토큰을 사용하여 새 액세스 토큰 발급 요청
+                    console.log('쿠키 발사 전')
+                    const reissueResponse = await axios.post('/reissue/token', {}, { withCredentials: true });
+
+                    console.log('쿠키 발사 후')
+                    
+                    // 새 액세스 토큰 저장
+                    const newAccessToken = getAccessTokenFromCookie();
+
+                    console.log('새 토큰 발급 완료')
+
+
+                    // 새로운 토큰으로 재요청
+                    const retryResponse = await axios.get(`${process.env.REACT_APP_APIURL}/api/optional-auth/cafe/${cafeId}`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${newAccessToken}`, // 새 토큰 추가
+                        }
+                    });
+
+                    // 데이터 가공 및 상태 업데이트
+                    retryResponse.data.data.cafeRating = Math.round(retryResponse.data.data.cafeRating * 10) / 10;
+                    setCafeData(retryResponse.data.data);
+                    setCafeLike(retryResponse.data.data.bookmarkChecked);
+
+                } catch (reissueError) {
+                    console.error('토큰 재발급 실패:', reissueError);
+                    // 추가적인 에러 처리 (예: 로그아웃 처리)
+                }
+            }
+        }
+    };
+
+
+
 
     useEffect(() => {
         if (cafeId) {
@@ -111,25 +146,55 @@ function CafeDetail() {
         )
     }
 
-    const updateBookmark = (newCafeLike) => {
+    
+    // 카페 상세 페이지에서 북마크 버튼
+    const updateBookmark = async (newCafeLike) => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            KakaoLogin();
+            return;
+        }
+
         const data = {
             cafeId: cafeId,
             bookmarkChecked: newCafeLike
         };
 
-        console.log("Sending data to server:", data); // 콘솔에 데이터를 출력하여 확인
-        axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            }
-        })
-            .then(res => {
-                console.log(res);
-            })
-            .catch(error => {
-                console.error('Error updating data: ', error);
+        console.log("Sending data to server:", data);
+
+        try {
+            await axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
+            console.log('Bookmark updated successfully');
+        } catch (error) {
+            console.error('카페 상세 페이지에서 북마크 도중 예외 발생: ', error);
+
+            // 401 Unauthorized 에러 발생 시 예외 처리
+            if (error.response && error.response.data.code === 'LOGIN_401_1') {
+                console.log('액세스 토큰 만료, 재발급 시도');
+                try {
+                    const reissueResponse = await axios.post('/reissue/token', {}, { withCredentials: true });
+
+                    const newAccessToken = getAccessTokenFromCookie();
+                    console.log('새 토큰 발급 완료');
+
+                    // 새 토큰으로 다시 북마크 요청
+                    await axios.post(`${process.env.REACT_APP_APIURL}/api/auth/bookmark`, data, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${newAccessToken}`
+                        }
+                    });
+                    console.log('Bookmark updated successfully after reissue');
+                } catch (reissueError) {
+                    console.error('토큰 재발급 실패:', reissueError);
+                }
+            }
+        }
     };
 
 
